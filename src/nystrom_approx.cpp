@@ -13,14 +13,14 @@ arma::mat nystrom(arma::mat K, int n_pts = 10){
     arma::uvec random_m = random_order.subvec(0,n_pts - 1);
 
     // std::cout << random_m << "\n";
-    arma::mat K_m = K.cols(random_m);
-    K_m = K_m.rows(random_m);
+    arma::mat K_nm = K.cols(random_m);
+    arma::mat K_m = K_nm.rows(random_m);
 
-    // return(K_m);
     // arma::vec eigval;
     // arma::mat eigvec;
     //
-    // eig_sym(eigval, eigvec, K(0, 0, arma::size(n_pts, n_pts) ), "std");
-
-    return(K.cols(random_m) * arma::inv_sympd(K_m) * K.rows(random_m));
+    // eig_sym(eigval, eigvec, K_m);
+    //
+    // arma::mat K_tilde(n_obs, n_obs, arma::fill::zeros);
+    return(K_nm * arma::inv_sympd(K_m) * K_nm.t());
 }
