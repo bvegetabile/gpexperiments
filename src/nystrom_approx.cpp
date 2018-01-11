@@ -4,23 +4,49 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-arma::mat nystrom(arma::mat K, int n_pts = 10){
-    int n_obs = K.n_rows;
+List nystrom(arma::mat K, int n_pts = 10){
+    double n_obs = K.n_rows;
     arma::uvec random_order(n_obs);
     std::iota(random_order.begin(), random_order.end(), 0);
     std::random_shuffle(random_order.begin(), random_order.end());
 
     arma::uvec random_m = random_order.subvec(0,n_pts - 1);
 
-    // std::cout << random_m << "\n";
     arma::mat K_nm = K.cols(random_m);
     arma::mat K_m = K_nm.rows(random_m);
 
-    // arma::vec eigval;
-    // arma::mat eigvec;
-    //
-    // eig_sym(eigval, eigvec, K_m);
-    //
-    // arma::mat K_tilde(n_obs, n_obs, arma::fill::zeros);
-    return(K_nm * arma::inv_sympd(K_m) * K_nm.t());
+    arma::vec eigval;
+    arma::mat eigvec;
+
+    eig_sym(eigval, eigvec, K_m);
+
+    arma::vec eigval_approx(n_pts);
+    arma::mat eigvec_approx(n_obs, n_pts, arma::fill::zeros);
+    for(int i = 0; i < n_pts; i++){
+        eigvec_approx.col(i) = std::sqrt(n_pts/n_obs) *  K_nm * eigvec.col(i) / eigval(i);
+        eigval_approx(i) = n_obs * eigval(i) / n_pts;
+    }
+    return(List::create(_["values"] = arma::flipud(eigval_approx),
+                        _["vectors"] = arma::fliplr(eigvec_approx)));
+}
+
+// [[Rcpp::export]]
+arma::mat nystrom_inv(arma::mat K, int n_pts = 10, double noise=1e-12){
+    List eig_approx = nystrom(K, n_pts);
+
+    arma::vec eig = eig_approx[0];
+    arma::mat C_inv = arma::diagmat(1/eig);
+    arma::mat U = eig_approx[1];
+
+    double n_obs = K.n_rows;
+
+    arma::mat A_inv(n_obs, n_obs, arma::fill::eye);
+    A_inv = A_inv / noise;
+
+    arma::mat L = arma::chol(C_inv + U.t() * A_inv * U);
+    arma::mat X = arma::solve(trimatl(L.t()), arma::solve(trimatu(L), U.t()));
+
+    arma::mat out = A_inv - A_inv * U * X * A_inv;
+
+    return(out);
 }
