@@ -50,3 +50,34 @@ arma::mat nystrom_inv(arma::mat K, int n_pts = 10, double noise=1e-12){
 
     return(out);
 }
+
+// [[Rcpp::export]]
+arma::mat nystrom_inv2(arma::mat K, int n_pts = 10, double noise=1e-12){
+    double n_obs = K.n_rows;
+    arma::uvec random_order(n_obs);
+    std::iota(random_order.begin(), random_order.end(), 0);
+    std::random_shuffle(random_order.begin(), random_order.end());
+
+    arma::uvec random_m = random_order.subvec(0,n_pts - 1);
+
+    arma::mat K_nm = K.cols(random_m);
+    arma::mat K_m = K_nm.rows(random_m);
+
+    arma::mat bigI(n_obs, n_obs, arma::fill::eye);
+
+    arma::mat L = arma::chol(noise * K_m + K_nm.t() * K_nm );
+    arma::mat X = arma::solve(trimatl(L.t()), arma::solve(trimatu(L), K_nm.t()), arma::solve_opts::no_approx);
+
+    arma::mat out = (bigI - K_nm * X) / noise;
+    return(out);
+}
+
+// [[Rcpp::export]]
+List c_eigen(arma::mat K){
+    arma::vec eigval;
+    arma::mat eigvec;
+
+    eig_sym(eigval, eigvec, K, "dc");
+    return(List::create(_["values"] = eigval,
+                        _["vectors"] = eigvec));
+}
