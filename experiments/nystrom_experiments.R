@@ -1,13 +1,16 @@
-n <- 1000
+n <- 5000
 A <- matrix(sqrt(abs(rnorm(n^2))), n, n)
 B <- t(A) %*% A
 
 rbenchmark::benchmark(solve(B),
                       eigen(B, symmetric = T),
                       c_eigen(B),
-                      nystrom_inv(B, 1000),
-                      nystrom_inv2(B,999),
+                      nystrom_inv(B, 5),
                       replications = 1)
+
+mean(solve(B) - nystrom_inv(B, 1000, 1e-3))
+
+
 
 par(mfrow=c(1,2))
 image(solve(B)-nystrom_inv(B, 999))
@@ -45,8 +48,10 @@ X <- X[order(X[,2]),]
 cov_mat <- gpbalancer::par_sqexp(X, c(1,1,1))
 
 all.equal(nystrom_inv(cov_mat,500), solve(cov_mat))
-mean(nystrom_inv(cov_mat,1000)-solve(cov_mat))
-rbenchmark::benchmark(nystrom_inv(cov_mat,500), solve(cov_mat))
+image(nystrom_inv(cov_mat,1000)-solve(cov_mat))
+rbenchmark::benchmark(nystrom_inv(cov_mat,1000),
+                      nystrom(cov_mat, 1000),
+                      solve(cov_mat), replications=1)
 
 # all.equal(solve(cov_mat), c_inv2(cov_mat))
 #

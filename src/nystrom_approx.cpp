@@ -31,7 +31,7 @@ List nystrom(arma::mat K, int n_pts = 10){
 }
 
 // [[Rcpp::export]]
-arma::mat nystrom_inv(arma::mat K, int n_pts = 10, double noise=1e-12){
+arma::mat nystrom_inv(arma::mat K, int n_pts = 10, double noise=1e-8){
     List eig_approx = nystrom(K, n_pts);
 
     arma::vec eig = eig_approx[0];
@@ -43,8 +43,8 @@ arma::mat nystrom_inv(arma::mat K, int n_pts = 10, double noise=1e-12){
     arma::mat A_inv(n_obs, n_obs, arma::fill::eye);
     A_inv = A_inv / noise;
 
-    arma::mat L = arma::chol(C_inv + U.t() * A_inv * U);
-    arma::mat X = arma::solve(trimatl(L.t()), arma::solve(trimatu(L), U.t()));
+    arma::mat L = arma::chol(C_inv + U.t() * U / noise , "lower");
+    arma::mat X = arma::solve(trimatu(L.t()), arma::solve(trimatl(L), U.t()));
 
     arma::mat out = A_inv - A_inv * U * X * A_inv;
 
@@ -52,7 +52,7 @@ arma::mat nystrom_inv(arma::mat K, int n_pts = 10, double noise=1e-12){
 }
 
 // [[Rcpp::export]]
-arma::mat nystrom_inv2(arma::mat K, int n_pts = 10, double noise=1e-12){
+arma::mat nystrom_inv2(arma::mat K, int n_pts = 10, double noise=1e-6){
     double n_obs = K.n_rows;
     arma::uvec random_order(n_obs);
     std::iota(random_order.begin(), random_order.end(), 0);
