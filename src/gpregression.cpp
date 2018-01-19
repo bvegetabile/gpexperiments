@@ -20,3 +20,4 @@ List c_gpr(arma::mat K_UL,
     return(List::create(_["f_train"] = f_train,
                         _["f_test"] = f_test));
 }
+

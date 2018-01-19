@@ -72,6 +72,22 @@ arma::mat nystrom_inv2(arma::mat K, int n_pts = 10, double noise=1e-6){
     return(out);
 }
 
+arma::mat nystrom_solve(arma::mat K, arma::vec t, int n_pts = 10, double noise=1e-6){
+    List eig_approx = nystrom(K, n_pts);
+
+    arma::vec eig = eig_approx[0];
+    arma::mat Lambda = arma::diagmat(eig);
+    arma::mat U = eig_approx[1];
+
+    double n_obs = K.n_rows;
+    arma::mat bigI(n_obs, n_obs, arma::fill::eye);
+
+    arma::mat L = arma::chol(noise * bigI + Lambda*U.t()*U, "lower");
+
+    arma::mat alph = (t - U * arma::solve(trimatu(L.t()), arma::solve(trimatl(L), Lambda * U.t() * t)))/noise;
+    return(alph);
+}
+
 // [[Rcpp::export]]
 List c_eigen(arma::mat K){
     arma::vec eigval;

@@ -1,0 +1,18 @@
+---
+title: "Nystrom Method"
+author: "Brian Vegetabile"
+date: "January 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview - What we're doing
+
+The goal here is to find a reduced-rank approximation to a Gram matrix $K$.  
+
+
+
+
