@@ -20,6 +20,108 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sqexp_cross
+arma::mat sqexp_cross(arma::mat X_train, arma::mat X_test, arma::rowvec hyperparams, double scale);
+RcppExport SEXP _gpexperiments_sqexp_cross(SEXP X_trainSEXP, SEXP X_testSEXP, SEXP hyperparamsSEXP, SEXP scaleSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X_train(X_trainSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X_test(X_testSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type hyperparams(hyperparamsSEXP);
+    Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(sqexp_cross(X_train, X_test, hyperparams, scale));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sqexp_common
+arma::mat sqexp_common(arma::mat X, double lengthscale, double scale, double noise);
+RcppExport SEXP _gpexperiments_sqexp_common(SEXP XSEXP, SEXP lengthscaleSEXP, SEXP scaleSEXP, SEXP noiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< double >::type lengthscale(lengthscaleSEXP);
+    Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
+    Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(sqexp_common(X, lengthscale, scale, noise));
+    return rcpp_result_gen;
+END_RCPP
+}
+// polykernel
+arma::mat polykernel(arma::mat X, double sig_zero, int pwr, double scale, double noise);
+RcppExport SEXP _gpexperiments_polykernel(SEXP XSEXP, SEXP sig_zeroSEXP, SEXP pwrSEXP, SEXP scaleSEXP, SEXP noiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< double >::type sig_zero(sig_zeroSEXP);
+    Rcpp::traits::input_parameter< int >::type pwr(pwrSEXP);
+    Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
+    Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(polykernel(X, sig_zero, pwr, scale, noise));
+    return rcpp_result_gen;
+END_RCPP
+}
+// arma_dot
+double arma_dot(arma::vec X1, arma::vec X2);
+RcppExport SEXP _gpexperiments_arma_dot(SEXP X1SEXP, SEXP X2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type X1(X1SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type X2(X2SEXP);
+    rcpp_result_gen = Rcpp::wrap(arma_dot(X1, X2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// par_ep
+List par_ep(arma::vec y, arma::mat cov_matrix, double tol, int max_iters, bool verbose);
+RcppExport SEXP _gpexperiments_par_ep(SEXP ySEXP, SEXP cov_matrixSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cov_matrix(cov_matrixSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iters(max_itersSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(par_ep(y, cov_matrix, tol, max_iters, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// seq_ep
+List seq_ep(arma::vec y, arma::mat cov_matrix, double tol, int max_iters, bool verbose);
+RcppExport SEXP _gpexperiments_seq_ep(SEXP ySEXP, SEXP cov_matrixSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cov_matrix(cov_matrixSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iters(max_itersSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(seq_ep(y, cov_matrix, tol, max_iters, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// par_ep_predict
+List par_ep_predict(arma::vec y, arma::mat cov_matrix, arma::mat cov_lower, arma::mat cov_between, double tol, int max_iters, bool verbose);
+RcppExport SEXP _gpexperiments_par_ep_predict(SEXP ySEXP, SEXP cov_matrixSEXP, SEXP cov_lowerSEXP, SEXP cov_betweenSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cov_matrix(cov_matrixSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cov_lower(cov_lowerSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cov_between(cov_betweenSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iters(max_itersSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(par_ep_predict(y, cov_matrix, cov_lower, cov_between, tol, max_iters, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // c_gpr
 List c_gpr(arma::mat K_UL, arma::vec y, arma::mat K_UR, arma::mat K_LR, double noise);
 RcppExport SEXP _gpexperiments_c_gpr(SEXP K_ULSEXP, SEXP ySEXP, SEXP K_URSEXP, SEXP K_LRSEXP, SEXP noiseSEXP) {
@@ -36,7 +138,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // nystrom
-arma::mat nystrom(arma::mat K, int n_pts);
+List nystrom(arma::mat K, int n_pts);
 RcppExport SEXP _gpexperiments_nystrom(SEXP KSEXP, SEXP n_ptsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -47,11 +149,71 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nystrom_inv
+arma::mat nystrom_inv(arma::mat K, int n_pts, double noise);
+RcppExport SEXP _gpexperiments_nystrom_inv(SEXP KSEXP, SEXP n_ptsSEXP, SEXP noiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type K(KSEXP);
+    Rcpp::traits::input_parameter< int >::type n_pts(n_ptsSEXP);
+    Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(nystrom_inv(K, n_pts, noise));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nystrom_inv2
+arma::mat nystrom_inv2(arma::mat K, int n_pts, double noise);
+RcppExport SEXP _gpexperiments_nystrom_inv2(SEXP KSEXP, SEXP n_ptsSEXP, SEXP noiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type K(KSEXP);
+    Rcpp::traits::input_parameter< int >::type n_pts(n_ptsSEXP);
+    Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(nystrom_inv2(K, n_pts, noise));
+    return rcpp_result_gen;
+END_RCPP
+}
+// c_eigen
+List c_eigen(arma::mat K);
+RcppExport SEXP _gpexperiments_c_eigen(SEXP KSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type K(KSEXP);
+    rcpp_result_gen = Rcpp::wrap(c_eigen(K));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nystrom_parallel
+List nystrom_parallel(arma::mat K, int n_pts);
+RcppExport SEXP _gpexperiments_nystrom_parallel(SEXP KSEXP, SEXP n_ptsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type K(KSEXP);
+    Rcpp::traits::input_parameter< int >::type n_pts(n_ptsSEXP);
+    rcpp_result_gen = Rcpp::wrap(nystrom_parallel(K, n_pts));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_sqexp", (DL_FUNC) &_gpexperiments_sqexp, 4},
+    {"_gpexperiments_sqexp_cross", (DL_FUNC) &_gpexperiments_sqexp_cross, 4},
+    {"_gpexperiments_sqexp_common", (DL_FUNC) &_gpexperiments_sqexp_common, 4},
+    {"_gpexperiments_polykernel", (DL_FUNC) &_gpexperiments_polykernel, 5},
+    {"_gpexperiments_arma_dot", (DL_FUNC) &_gpexperiments_arma_dot, 2},
+    {"_gpexperiments_par_ep", (DL_FUNC) &_gpexperiments_par_ep, 5},
+    {"_gpexperiments_seq_ep", (DL_FUNC) &_gpexperiments_seq_ep, 5},
+    {"_gpexperiments_par_ep_predict", (DL_FUNC) &_gpexperiments_par_ep_predict, 7},
     {"_gpexperiments_c_gpr", (DL_FUNC) &_gpexperiments_c_gpr, 5},
     {"_gpexperiments_nystrom", (DL_FUNC) &_gpexperiments_nystrom, 2},
+    {"_gpexperiments_nystrom_inv", (DL_FUNC) &_gpexperiments_nystrom_inv, 3},
+    {"_gpexperiments_nystrom_inv2", (DL_FUNC) &_gpexperiments_nystrom_inv2, 3},
+    {"_gpexperiments_c_eigen", (DL_FUNC) &_gpexperiments_c_eigen, 1},
+    {"_gpexperiments_nystrom_parallel", (DL_FUNC) &_gpexperiments_nystrom_parallel, 2},
     {NULL, NULL, 0}
 };
 

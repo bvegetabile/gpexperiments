@@ -5,11 +5,55 @@ sqexp <- function(X, hyperparams, scale = 1.0, noise = 1e-6) {
     .Call(`_gpexperiments_sqexp`, X, hyperparams, scale, noise)
 }
 
+sqexp_cross <- function(X_train, X_test, hyperparams, scale = 1.0) {
+    .Call(`_gpexperiments_sqexp_cross`, X_train, X_test, hyperparams, scale)
+}
+
+sqexp_common <- function(X, lengthscale, scale = 1.0, noise = 1e-6) {
+    .Call(`_gpexperiments_sqexp_common`, X, lengthscale, scale, noise)
+}
+
+polykernel <- function(X, sig_zero, pwr = 1L, scale = 1.0, noise = 1e-6) {
+    .Call(`_gpexperiments_polykernel`, X, sig_zero, pwr, scale, noise)
+}
+
+arma_dot <- function(X1, X2) {
+    .Call(`_gpexperiments_arma_dot`, X1, X2)
+}
+
+par_ep <- function(y, cov_matrix, tol, max_iters, verbose) {
+    .Call(`_gpexperiments_par_ep`, y, cov_matrix, tol, max_iters, verbose)
+}
+
+seq_ep <- function(y, cov_matrix, tol, max_iters, verbose) {
+    .Call(`_gpexperiments_seq_ep`, y, cov_matrix, tol, max_iters, verbose)
+}
+
+par_ep_predict <- function(y, cov_matrix, cov_lower, cov_between, tol, max_iters, verbose) {
+    .Call(`_gpexperiments_par_ep_predict`, y, cov_matrix, cov_lower, cov_between, tol, max_iters, verbose)
+}
+
 c_gpr <- function(K_UL, y, K_UR, K_LR, noise) {
     .Call(`_gpexperiments_c_gpr`, K_UL, y, K_UR, K_LR, noise)
 }
 
 nystrom <- function(K, n_pts = 10L) {
     .Call(`_gpexperiments_nystrom`, K, n_pts)
+}
+
+nystrom_inv <- function(K, n_pts = 10L, noise = 1e-8) {
+    .Call(`_gpexperiments_nystrom_inv`, K, n_pts, noise)
+}
+
+nystrom_inv2 <- function(K, n_pts = 10L, noise = 1e-6) {
+    .Call(`_gpexperiments_nystrom_inv2`, K, n_pts, noise)
+}
+
+c_eigen <- function(K) {
+    .Call(`_gpexperiments_c_eigen`, K)
+}
+
+nystrom_parallel <- function(K, n_pts = 10L) {
+    .Call(`_gpexperiments_nystrom_parallel`, K, n_pts)
 }
 

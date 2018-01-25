@@ -33,3 +33,43 @@ arma::mat sqexp_cross(arma::mat X_train,
     }
     return(cov_mat);
 }
+
+// [[Rcpp::export]]
+arma::mat sqexp_common(arma::mat X,
+                double lengthscale,
+                double scale=1.0,
+                double noise = 1e-6){
+    arma::mat cov_mat(X.n_rows, X.n_rows, arma::fill::zeros);
+    for(int i = 0; i < X.n_rows; i++){
+        for(int j = i; j < X.n_rows; j++){
+            cov_mat(i, j) = scale * std::exp(- 0.5 * arma::sum(arma::pow(X.row(i) - X.row(j), 2) * std::pow(lengthscale,2)));
+            cov_mat(j, i) = cov_mat(i, j);
+        }
+        cov_mat(i,i) = cov_mat(i,i) + noise;
+    }
+    return(cov_mat);
+}
+//
+// [[Rcpp::export]]
+arma::mat polykernel(arma::mat X,
+                       double sig_zero,
+                       int pwr = 1,
+                       double scale=1.0,
+                       double noise = 1e-6){
+    arma::mat cov_mat(X.n_rows, X.n_rows, arma::fill::zeros);
+    for(int i = 0; i < X.n_rows; i++){
+        for(int j = i; j < X.n_rows; j++){
+            cov_mat(i, j) = scale * std::pow((arma::dot(X.row(i), X.row(j)) + sig_zero), pwr);
+            cov_mat(j, i) = cov_mat(i, j);
+        }
+        cov_mat(i,i) = cov_mat(i,i) + noise;
+    }
+    return(cov_mat);
+}
+//
+//
+
+// [[Rcpp::export]]
+double arma_dot(arma::vec X1, arma::vec X2){
+    return(arma::dot(X1, X2));
+}
