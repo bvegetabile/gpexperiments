@@ -32,15 +32,19 @@ lm_ps_robust <- function(Y, X, wts, true_val = NULL){
 library('gpexperiments')
 X <- as.matrix(seq(-3, 3, length.out = 100))
 
-cov_sqexp <- sqexp_common(X, 1, 1, noise = 1e-6)
+cov_sqexp <- gpexperiments::sqexp_common(X, 1, 1, noise = 1e-6)
 cov_poly1 <- polykernel(X, 0.5, 1)
+cov_poly2 <- polykernel(X, 0.5, 2)
 
 cov_added <- cov_sqexp + cov_poly1
 
-par(mfrow=c(1,3))
+par(mfrow=c(2,3))
 image(X, X, cov_sqexp)
 image(X, X, cov_poly1)
+image(X, X, cov_poly2)
 image(X, X, cov_sqexp + cov_poly1)
+image(X, X, cov_sqexp + cov_poly2)
+image(X, X, cov_sqexp + cov_poly2 + cov_poly1)
 
 n_samples <- 10
 draws1 <- mvtnorm::rmvnorm(n_samples, sigma=cov_sqexp)
@@ -72,9 +76,9 @@ p_test <- pnorm(-0.5 * X_test)
 t_test <- rbinom(n_test, 1, p_test)
 plot(X_test, p_test, ylim=c(0,1))
 
-sqexp_cov <- sqexp(X_test, c(1), noise=1e-6)
-poly1_cov <- polykernel(X_test, 0.75, power = 1)
-poly2_cov <- polykernel(X_test, 0.75, power = 1)
+sqexp_cov <- sqexp_common(X_test, 1, noise=1e-6)
+poly1_cov <- polykernel(X_test, 0.75, pwr = 1)
+poly2_cov <- polykernel(X_test, 0.75, pwr = 1)
 
 fit1 <- gpbalancer::gpbal_fixed(t_test, sqexp_cov)
 fit2 <- gpbalancer::gpbal_fixed(t_test, poly1_cov)
@@ -92,16 +96,16 @@ plot(p_test, fit5$ps)
 plot(p_test, fit6$ps)
 
 
-n_test <- 300
+n_test <- 1500
 X_test <- as.matrix(rnorm(n_test))
 p_test <- 0.8 * pnorm(-0.5 * X_test^3 + 0.25 * X_test) + 0.1
-# p_test <- 0.8 * pnorm(0.25 * X_test) + 0.1
+p_test <- 0.8 * pnorm(0.75 * X_test^2) - 0.25 + 0.1 *X_test
 t_test <- rbinom(n_test, 1, p_test)
 plot(X_test, p_test, ylim=c(0,1))
 
 sqexp_cov <- sqexp(X_test, c(3), noise=1e-6)
-poly1_cov <- polykernel(X_test, 0.5, power = 1)
-poly2_cov <- polykernel(X_test, 0.5, power = 2)
+poly1_cov <- polykernel(X_test, 0.5, pwr = 1)
+poly2_cov <- polykernel(X_test, 0.5, pwr = 2)
 
 fit1 <- gpbalancer::gpbal_fixed(t_test, sqexp_cov)
 fit2 <- gpbalancer::gpbal_fixed(t_test, poly1_cov)
@@ -134,7 +138,7 @@ lines(X_test[order(X_test)], p_test[order(X_test)],
 # abline(0,1)
 
 testing <- gpexperiments::gpbal_test(X_test, t_test,
-                                     sqexp_poly, c(1,1,1,1),
+                                     sqexp_poly, c(1,1,1),
                                      return_theta = T, verbose = T)
 retest <- gpexperiments::gpbal(X_test, t_test,
                                gpbalancer::par_sqexp, c(1),
@@ -168,8 +172,8 @@ for(s in 1:n_sims){
 
     design_x <- cbind(1, t_test)
 
-    yt <- X_test^2 + 2 + rnorm(n_test, sd=0.25)
-    yc <- X_test + rnorm(n_test, sd=0.25)
+    yt <- X_test^2 + 2 + rnorm(n_test, sd = 0.25)
+    yc <- X_test + rnorm(n_test, sd = 0.25)
     yo <- t_test * yt + (1 - t_test) * yc
 
     fit_new <- gpexperiments::gpbal_test(X_test, t_test,
@@ -200,4 +204,9 @@ for(s in 1:n_sims){
 
 }
 message(paste('Fin',sep=""), appendLF = T)
+
+
+mean_res <- outres[,c(1,3,5)]
+vars_res <- outres[,c(2,4,6)]
+apply(mean_res, 2, var) / apply(vars_res, 2, mean)
 

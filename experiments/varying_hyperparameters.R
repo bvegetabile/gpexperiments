@@ -43,24 +43,38 @@ lm_ps_robust <- function(Y, X, wts, true_val = NULL){
     }
 }
 
+lo <- 40
 
-
-test_rho <- seq(0.05,10,0.05)
+test_rho <- seq(0.05,2,length.out = lo)
+test_sig <- seq(0,10, length.out = lo)
 n_sims <- 100
+n_obs <- 250
 true_ate <- 3
 mean_results <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
 vars_results <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
 bals_results <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+
+poly1_mean_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+poly1_vars_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+poly1_bals_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+
+poly2_mean_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+poly2_vars_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+poly2_bals_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+
+poly3_mean_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+poly3_vars_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+poly3_bals_res <- matrix(NA, nrow=n_sims, ncol=length(test_rho))
+
+
 for(i in 1:n_sims){
-    n_obs <- 250
     X <- rnorm(n_obs)
-    # p <- pnorm(-0.5 * X)
 
     p <- 0.8*pnorm(-0.5 * X^2 + 0.25 * X) + 0.25
     TA <- rbinom(n_obs, 1, p)
     design_mat <- cbind(1, TA)
 
-    po_stdev <- 3
+    po_stdev <- 0.25
     YT <- X^2 + 2 + rnorm(n_obs, 0, po_stdev)
     YC <- X + rnorm(n_obs, 0, po_stdev)
     YO <- TA * YT + (1-TA)*YC
@@ -68,12 +82,47 @@ for(i in 1:n_sims){
     for(r in 1:length(test_rho)){
         cov_mat <- gpbalancer::par_sqexp(as.matrix(X), c(1, test_rho[r]))
         est_obgpps <- gpbalancer::gpbal_fixed(TA, cov_mat, verbose=F)
+
+        cov_poly1 <- gpexperiments::polykernel(as.matrix(X), sig_zero = test_sig[r], pwr=1, noise = 1e-6)
+        cov_poly2 <- gpexperiments::polykernel(as.matrix(X), sig_zero = test_sig[r], pwr=2, noise = 1e-6)
+        cov_poly3 <- gpexperiments::polykernel(as.matrix(X), sig_zero = test_sig[r], pwr=10, noise = 1e-6)
+
+        est_poly1 <- gpbalancer::gpbal_fixed(TA, cov_poly1, verbose=F)
+        est_poly2 <- gpbalancer::gpbal_fixed(TA, cov_poly2, verbose=F)
+        est_poly3 <- gpbalancer::gpbal_fixed(TA, cov_poly3, verbose=F)
+
         wts <- make_wts(TA, est_obgpps$ps)
+        wts1 <- make_wts(TA, est_poly1$ps)
+        wts2 <- make_wts(TA, est_poly2$ps)
+        wts3 <- make_wts(TA, est_poly3$ps)
+
+
         bal_obgpps <- gpbalancer::bal_stats(X, TA, wts=wts)[7]
+        bal_poly1 <- gpbalancer::bal_stats(X, TA, wts=wts1)[7]
+        bal_poly2 <- gpbalancer::bal_stats(X, TA, wts=wts2)[7]
+        bal_poly3 <- gpbalancer::bal_stats(X, TA, wts=wts3)[7]
+
         res <- lm_ps_robust(YO, design_mat, wts, true_ate)
+        res1 <- lm_ps_robust(YO, design_mat, wts1, true_ate)
+        res2 <- lm_ps_robust(YO, design_mat, wts2, true_ate)
+        res3 <- lm_ps_robust(YO, design_mat, wts3, true_ate)
+
         mean_results[i, r] <- res$ests$coef[2]
         vars_results[i, r] <- res$ests$stderrs[2]^2
         bals_results[i, r] <- bal_obgpps
+
+        poly1_mean_res[i, r] <- res1$ests$coef[2]
+        poly1_vars_res[i, r] <- res1$ests$stderrs[2]^2
+        poly1_bals_res[i, r] <- bal_poly1
+
+        poly2_mean_res[i, r] <- res2$ests$coef[2]
+        poly2_vars_res[i, r] <- res2$ests$stderrs[2]^2
+        poly2_bals_res[i, r] <- bal_poly2
+
+        poly3_mean_res[i, r] <- res3$ests$coef[2]
+        poly3_vars_res[i, r] <- res3$ests$stderrs[2]^2
+        poly3_bals_res[i, r] <- bal_poly3
+
     }
     message(paste(i,':',sep=""), appendLF = F)
 }
@@ -81,6 +130,20 @@ for(i in 1:n_sims){
 lowers <- mean_results - 1.96 * sqrt(vars_results)
 uppers <- mean_results + 1.96 * sqrt(vars_results)
 covers <- apply((lowers < 3) & (uppers > 3),2, mean)
+
+poly_range <- range(c(poly1_mean_res, poly2_mean_res, poly3_mean_res))
+
+plot(test_sig, apply(poly1_mean_res, 2, mean), ylim=poly_range)
+lines(test_sig, apply(poly2_mean_res, 2, mean))
+lines(test_sig, apply(poly3_mean_res, 2, mean))
+
+
+plot(test_sig, apply(poly1_mean_res, 2, var) / apply(poly1_vars_res, 2, mean), ylim=c(0.5,1.5))
+lines(test_sig, apply(poly2_mean_res, 2, var) / apply(poly2_vars_res, 2, mean))
+lines(test_sig, apply(poly3_mean_res, 2, var) / apply(poly3_vars_res, 2, mean))
+
+
+
 
 pdf('./experiments/simulation_figure_po-sd_three.pdf', height=5, width=8)
 

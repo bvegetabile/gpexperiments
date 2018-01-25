@@ -240,7 +240,7 @@ gpbal_test <- function(X, y,
 
     objective_function <- function(theta){
         ncov <- length(theta)
-        print(theta)
+        # print(theta)
         cov_matrix <- cov_function(as.matrix(X), theta)
         ps_res <- gpbal_fixed(y, cov_matrix, verbose = F, tol = 1e-2, ep_vers=ep_vers)
         ps_est <- pnorm(ps_res$PosteriorMean)
@@ -285,10 +285,14 @@ gpbal_test <- function(X, y,
 
         message(paste('Optimal Covariate Balance:', opt_theta$fval))
     }
-    print(opt_theta$par)
+    # print(opt_theta$par)
     opt_matrix <- cov_function(as.matrix(X), opt_theta$par)
     opt_ps <- gpbal_fixed(y, opt_matrix, verbose = F, tol = 1e-2, ep_vers=ep_vers)
     opt_ps$ComputationTime <- difftime(end_time, start_time, units='secs')
+
+    if(return_theta==T){
+        opt_ps$thetas <- opt_theta$par
+    }
 
     return(opt_ps)
 }

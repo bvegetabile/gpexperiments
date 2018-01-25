@@ -1,8 +1,8 @@
 sqexp_poly <- function(X, theta, noise = 1e-4){
     scale0 <- theta[1]
     sig0 <- theta[2]
-    scale1 <- theta[3]
-    ls1 <- theta[4]
+    scale1 <- 1
+    ls1 <- theta[3]
 
 
     K1 <- polykernel(X, sig0, pwr = 1,
