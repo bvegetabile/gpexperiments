@@ -75,8 +75,8 @@ arma::mat polykernel(arma::mat X,
 }
 //
 //
-
-// [[Rcpp::export]]
-double arma_dot(arma::vec X1, arma::vec X2){
-    return(arma::dot(X1, X2));
-}
+//
+// // [[Rcpp::export]]
+// double arma_dot(arma::vec X1, arma::vec X2){
+//     return(arma::dot(X1, X2));
+// }

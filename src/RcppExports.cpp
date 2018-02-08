@@ -63,18 +63,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// arma_dot
-double arma_dot(arma::vec X1, arma::vec X2);
-RcppExport SEXP _gpexperiments_arma_dot(SEXP X1SEXP, SEXP X2SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type X1(X1SEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type X2(X2SEXP);
-    rcpp_result_gen = Rcpp::wrap(arma_dot(X1, X2));
-    return rcpp_result_gen;
-END_RCPP
-}
 // par_ep
 List par_ep(arma::vec y, arma::mat cov_matrix, double tol, int max_iters, bool verbose);
 RcppExport SEXP _gpexperiments_par_ep(SEXP ySEXP, SEXP cov_matrixSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
@@ -175,17 +163,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// c_eigen
-List c_eigen(arma::mat K);
-RcppExport SEXP _gpexperiments_c_eigen(SEXP KSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type K(KSEXP);
-    rcpp_result_gen = Rcpp::wrap(c_eigen(K));
-    return rcpp_result_gen;
-END_RCPP
-}
 // nystrom_parallel
 List nystrom_parallel(arma::mat K, int n_pts);
 RcppExport SEXP _gpexperiments_nystrom_parallel(SEXP KSEXP, SEXP n_ptsSEXP) {
@@ -204,7 +181,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_sqexp_cross", (DL_FUNC) &_gpexperiments_sqexp_cross, 4},
     {"_gpexperiments_sqexp_common", (DL_FUNC) &_gpexperiments_sqexp_common, 4},
     {"_gpexperiments_polykernel", (DL_FUNC) &_gpexperiments_polykernel, 5},
-    {"_gpexperiments_arma_dot", (DL_FUNC) &_gpexperiments_arma_dot, 2},
     {"_gpexperiments_par_ep", (DL_FUNC) &_gpexperiments_par_ep, 5},
     {"_gpexperiments_seq_ep", (DL_FUNC) &_gpexperiments_seq_ep, 5},
     {"_gpexperiments_par_ep_predict", (DL_FUNC) &_gpexperiments_par_ep_predict, 7},
@@ -212,7 +188,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_nystrom", (DL_FUNC) &_gpexperiments_nystrom, 2},
     {"_gpexperiments_nystrom_inv", (DL_FUNC) &_gpexperiments_nystrom_inv, 3},
     {"_gpexperiments_nystrom_inv2", (DL_FUNC) &_gpexperiments_nystrom_inv2, 3},
-    {"_gpexperiments_c_eigen", (DL_FUNC) &_gpexperiments_c_eigen, 1},
     {"_gpexperiments_nystrom_parallel", (DL_FUNC) &_gpexperiments_nystrom_parallel, 2},
     {NULL, NULL, 0}
 };

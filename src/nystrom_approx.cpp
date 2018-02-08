@@ -87,13 +87,13 @@ arma::mat nystrom_solve(arma::mat K, arma::vec t, int n_pts = 10, double noise=1
     arma::mat alph = (t - U * arma::solve(trimatu(L.t()), arma::solve(trimatl(L), Lambda * U.t() * t)))/noise;
     return(alph);
 }
-
-// [[Rcpp::export]]
-List c_eigen(arma::mat K){
-    arma::vec eigval;
-    arma::mat eigvec;
-
-    eig_sym(eigval, eigvec, K, "dc");
-    return(List::create(_["values"] = eigval,
-                        _["vectors"] = eigvec));
-}
+//
+// // [[Rcpp::export]]
+// List c_eigen(arma::mat K){
+//     arma::vec eigval;
+//     arma::mat eigvec;
+//
+//     eig_sym(eigval, eigvec, K, "dc");
+//     return(List::create(_["values"] = eigval,
+//                         _["vectors"] = eigvec));
+// }

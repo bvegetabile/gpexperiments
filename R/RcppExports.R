@@ -17,10 +17,6 @@ polykernel <- function(X, sig_zero, pwr = 1L, scale = 1.0, noise = 1e-6) {
     .Call(`_gpexperiments_polykernel`, X, sig_zero, pwr, scale, noise)
 }
 
-arma_dot <- function(X1, X2) {
-    .Call(`_gpexperiments_arma_dot`, X1, X2)
-}
-
 par_ep <- function(y, cov_matrix, tol, max_iters, verbose) {
     .Call(`_gpexperiments_par_ep`, y, cov_matrix, tol, max_iters, verbose)
 }
@@ -47,10 +43,6 @@ nystrom_inv <- function(K, n_pts = 10L, noise = 1e-8) {
 
 nystrom_inv2 <- function(K, n_pts = 10L, noise = 1e-6) {
     .Call(`_gpexperiments_nystrom_inv2`, K, n_pts, noise)
-}
-
-c_eigen <- function(K) {
-    .Call(`_gpexperiments_c_eigen`, K)
 }
 
 nystrom_parallel <- function(K, n_pts = 10L) {

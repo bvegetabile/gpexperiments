@@ -96,7 +96,7 @@ plot(p_test, fit5$ps)
 plot(p_test, fit6$ps)
 
 
-n_test <- 1500
+n_test <- 500
 X_test <- as.matrix(rnorm(n_test))
 p_test <- 0.8 * pnorm(-0.5 * X_test^3 + 0.25 * X_test) + 0.1
 p_test <- 0.8 * pnorm(0.75 * X_test^2) - 0.25 + 0.1 *X_test
@@ -178,7 +178,7 @@ for(s in 1:n_sims){
 
     fit_new <- gpexperiments::gpbal_test(X_test, t_test,
                                          # gpbalancer::par_sqexp, c(1,1),
-                                         sqexp_poly, c(1,1,1,1),
+                                         sqexp_poly, c(1,1,1),
                                          return_theta = T, verbose = F)
     fit_old <- gpexperiments::gpbal(X_test, t_test,
                                    gpbalancer::par_sqexp, c(1),
