@@ -29,8 +29,7 @@ struct ConstructSEPKernel : public Worker {
      *
      */
     const arma::mat& x_mat;
-    const arma::vec& se_hp;
-    const arma::vec& np_hp;
+    const arma::vec& hyperparams;
     const double& sig_noise;
 
     /* Outputs
@@ -40,13 +39,11 @@ struct ConstructSEPKernel : public Worker {
 
     // initialize
     ConstructSEPKernel(const arma::mat& x_mat,
-                       const arma::vec& se_hp,
-                       const arma::vec& np_hp,
+                       const arma::vec& hyperparams,
                        const double& sig_noise,
                        arma::mat& cov_mat)
         : x_mat(x_mat),
-          se_hp(se_hp),
-          np_hp(np_hp),
+          hyperparams(hyperparams),
           sig_noise(sig_noise),
           cov_mat(cov_mat) {}
 
@@ -54,12 +51,14 @@ struct ConstructSEPKernel : public Worker {
     void operator()(std::size_t row_beg, std::size_t row_end) {
         // double x_dim = x_mat.n_cols;
 
-        double se_invls = se_hp[0];
-        double se_scale = se_hp[1];
+        double se_invls = hyperparams[0];
+        // double se_scale = hyperparams[1];
+        double se_scale = 1.0;
 
-        double np_shift = np_hp[0];
-        int np_power = np_hp[1];
-        double np_scale = np_hp[2];
+        double np_shift = hyperparams[1];
+        // int np_power = hyperparams[3];
+        int np_power = 1;
+        double np_scale = hyperparams[2];
 
         for(int i = row_beg; i < row_end; i++){
             for(int j = 0; j <= i; j++){
@@ -74,8 +73,7 @@ struct ConstructSEPKernel : public Worker {
 
 // [[Rcpp::export]]
 arma::mat par_sepkernel(const arma::mat& x_mat,
-                        const arma::vec& se_hp,
-                        const arma::vec& np_hp,
+                        const arma::vec& hyperparams,
                         const double sig_noise = 1e-6){
 
     // allocate the matrix we will return
@@ -83,8 +81,7 @@ arma::mat par_sepkernel(const arma::mat& x_mat,
 
     // create the worker
     ConstructSEPKernel constructSEPKernel(x_mat,
-                                          se_hp,
-                                          np_hp,
+                                          hyperparams,
                                           sig_noise,
                                           cov_mat);
 

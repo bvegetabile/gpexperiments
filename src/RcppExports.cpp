@@ -175,6 +175,48 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// normalized_polykernel
+double normalized_polykernel(const arma::rowvec& X_i, const arma::rowvec& X_j, const double& sig0, const int powval, const double sig1);
+RcppExport SEXP _gpexperiments_normalized_polykernel(SEXP X_iSEXP, SEXP X_jSEXP, SEXP sig0SEXP, SEXP powvalSEXP, SEXP sig1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type X_i(X_iSEXP);
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type X_j(X_jSEXP);
+    Rcpp::traits::input_parameter< const double& >::type sig0(sig0SEXP);
+    Rcpp::traits::input_parameter< const int >::type powval(powvalSEXP);
+    Rcpp::traits::input_parameter< const double >::type sig1(sig1SEXP);
+    rcpp_result_gen = Rcpp::wrap(normalized_polykernel(X_i, X_j, sig0, powval, sig1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sqexp_kernel
+double sqexp_kernel(const arma::rowvec& X_i, const arma::rowvec& X_j, const double& inv_ls, const double sig1);
+RcppExport SEXP _gpexperiments_sqexp_kernel(SEXP X_iSEXP, SEXP X_jSEXP, SEXP inv_lsSEXP, SEXP sig1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type X_i(X_iSEXP);
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type X_j(X_jSEXP);
+    Rcpp::traits::input_parameter< const double& >::type inv_ls(inv_lsSEXP);
+    Rcpp::traits::input_parameter< const double >::type sig1(sig1SEXP);
+    rcpp_result_gen = Rcpp::wrap(sqexp_kernel(X_i, X_j, inv_ls, sig1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// par_sepkernel
+arma::mat par_sepkernel(const arma::mat& x_mat, const arma::vec& hyperparams, const double sig_noise);
+RcppExport SEXP _gpexperiments_par_sepkernel(SEXP x_matSEXP, SEXP hyperparamsSEXP, SEXP sig_noiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x_mat(x_matSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type hyperparams(hyperparamsSEXP);
+    Rcpp::traits::input_parameter< const double >::type sig_noise(sig_noiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(par_sepkernel(x_mat, hyperparams, sig_noise));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_sqexp", (DL_FUNC) &_gpexperiments_sqexp, 4},
@@ -189,6 +231,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_nystrom_inv", (DL_FUNC) &_gpexperiments_nystrom_inv, 3},
     {"_gpexperiments_nystrom_inv2", (DL_FUNC) &_gpexperiments_nystrom_inv2, 3},
     {"_gpexperiments_nystrom_parallel", (DL_FUNC) &_gpexperiments_nystrom_parallel, 2},
+    {"_gpexperiments_normalized_polykernel", (DL_FUNC) &_gpexperiments_normalized_polykernel, 5},
+    {"_gpexperiments_sqexp_kernel", (DL_FUNC) &_gpexperiments_sqexp_kernel, 4},
+    {"_gpexperiments_par_sepkernel", (DL_FUNC) &_gpexperiments_par_sepkernel, 3},
     {NULL, NULL, 0}
 };
 

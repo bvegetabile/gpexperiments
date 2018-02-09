@@ -49,3 +49,15 @@ nystrom_parallel <- function(K, n_pts = 10L) {
     .Call(`_gpexperiments_nystrom_parallel`, K, n_pts)
 }
 
+normalized_polykernel <- function(X_i, X_j, sig0, powval = 1L, sig1 = 1.0) {
+    .Call(`_gpexperiments_normalized_polykernel`, X_i, X_j, sig0, powval, sig1)
+}
+
+sqexp_kernel <- function(X_i, X_j, inv_ls, sig1 = 1.0) {
+    .Call(`_gpexperiments_sqexp_kernel`, X_i, X_j, inv_ls, sig1)
+}
+
+par_sepkernel <- function(x_mat, hyperparams, sig_noise = 1e-6) {
+    .Call(`_gpexperiments_par_sepkernel`, x_mat, hyperparams, sig_noise)
+}
+
