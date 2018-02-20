@@ -29,8 +29,16 @@ par_ep_predict <- function(y, cov_matrix, cov_lower, cov_between, tol, max_iters
     .Call(`_gpexperiments_par_ep_predict`, y, cov_matrix, cov_lower, cov_between, tol, max_iters, verbose)
 }
 
+gp_mcla <- function(covmat, targets, n_classes) {
+    .Call(`_gpexperiments_gp_mcla`, covmat, targets, n_classes)
+}
+
 c_gpr <- function(K_UL, y, K_UR, K_LR, noise) {
     .Call(`_gpexperiments_c_gpr`, K_UL, y, K_UR, K_LR, noise)
+}
+
+mc_sqexp_common <- function(X, inv_ls_vec, scale = 1.0, noise = 1e-6) {
+    .Call(`_gpexperiments_mc_sqexp_common`, X, inv_ls_vec, scale, noise)
 }
 
 nystrom <- function(K, n_pts = 10L) {

@@ -110,6 +110,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// gp_mcla
+arma::mat gp_mcla(arma::mat covmat, arma::vec targets, int n_classes);
+RcppExport SEXP _gpexperiments_gp_mcla(SEXP covmatSEXP, SEXP targetsSEXP, SEXP n_classesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type covmat(covmatSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type targets(targetsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_classes(n_classesSEXP);
+    rcpp_result_gen = Rcpp::wrap(gp_mcla(covmat, targets, n_classes));
+    return rcpp_result_gen;
+END_RCPP
+}
 // c_gpr
 List c_gpr(arma::mat K_UL, arma::vec y, arma::mat K_UR, arma::mat K_LR, double noise);
 RcppExport SEXP _gpexperiments_c_gpr(SEXP K_ULSEXP, SEXP ySEXP, SEXP K_URSEXP, SEXP K_LRSEXP, SEXP noiseSEXP) {
@@ -122,6 +135,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type K_LR(K_LRSEXP);
     Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
     rcpp_result_gen = Rcpp::wrap(c_gpr(K_UL, y, K_UR, K_LR, noise));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mc_sqexp_common
+arma::mat mc_sqexp_common(arma::mat X, arma::vec inv_ls_vec, double scale, double noise);
+RcppExport SEXP _gpexperiments_mc_sqexp_common(SEXP XSEXP, SEXP inv_ls_vecSEXP, SEXP scaleSEXP, SEXP noiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type inv_ls_vec(inv_ls_vecSEXP);
+    Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
+    Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(mc_sqexp_common(X, inv_ls_vec, scale, noise));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -226,7 +253,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_par_ep", (DL_FUNC) &_gpexperiments_par_ep, 5},
     {"_gpexperiments_seq_ep", (DL_FUNC) &_gpexperiments_seq_ep, 5},
     {"_gpexperiments_par_ep_predict", (DL_FUNC) &_gpexperiments_par_ep_predict, 7},
+    {"_gpexperiments_gp_mcla", (DL_FUNC) &_gpexperiments_gp_mcla, 3},
     {"_gpexperiments_c_gpr", (DL_FUNC) &_gpexperiments_c_gpr, 5},
+    {"_gpexperiments_mc_sqexp_common", (DL_FUNC) &_gpexperiments_mc_sqexp_common, 4},
     {"_gpexperiments_nystrom", (DL_FUNC) &_gpexperiments_nystrom, 2},
     {"_gpexperiments_nystrom_inv", (DL_FUNC) &_gpexperiments_nystrom_inv, 3},
     {"_gpexperiments_nystrom_inv2", (DL_FUNC) &_gpexperiments_nystrom_inv2, 3},

@@ -1,10 +1,12 @@
 source('~/git/causalTools/causalTools.R')
 
 # set.seed(1162018)
-n_obs <- 100
+n_obs <- 1000
 X <- rnorm(n_obs, sd=1.5)
+X <- seq(-4,4,length.out = n_obs)
 X <- X[order(X)]
 f1 <- 1.75 * X + 1
+# f1 <- 3.75 * X + 1
 f2 <- 0.1 * X^3  + 0.25*X^2 - 1
 p1 <- exp(f1) / (1 + exp(f1) + exp(f2))
 p2 <- exp(f2) / (1 + exp(f1) + exp(f2))
@@ -26,6 +28,31 @@ for(j in 1:n_obs){
     class_label[j, ] <- which(r_sample[j,] == 1)
 }
 
-covmat <- mc_sqexp_common(as.matrix(X), c(1,1,1))
+make_binary <- function(class_labels){
+    classes <- as.vector(unique(class_labels))
+    classes <- classes[order(classes)]
+    n_unique <- length(classes)
+    out_mat <- matrix(NA, nrow=length(class_labels), ncol=n_unique)
+    for(c in 1:n_unique){
+        out_mat[,c] <- ifelse(class_labels == classes[c], 1, 0)
+    }
+    as.vector(out_mat)
+}
 
-outro <- gp_mcla(covmat, rep(class_label,3), 3)
+make_binary(class_label)
+
+covmat1 <- mc_sqexp_common(as.matrix(X), c(1.25,1.25,1.25))
+covmat2 <- mc_normpoly_common(as.matrix(X),
+                             c(25,25,25),
+                             c(3,3,3), power = 1)
+covmat <- covmat1 + covmat2
+
+outro <- gp_mcla(covmat, make_binary(class_label), 3, max_iters = 50)
+
+
+plot(X, p1, ylim=c(0,1), type='l', col='red')
+lines(X, p2, ylim=c(0,1), col='blue')
+lines(X, p3, ylim=c(0,1), col='green')
+points(X, outro[,1], pch=4, col='red')
+points(X, outro[,2], pch=4, col='blue')
+points(X, outro[,3], pch=4, col='green')
