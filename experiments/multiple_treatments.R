@@ -1,7 +1,7 @@
 source('~/git/causalTools/causalTools.R')
 
 # set.seed(1162018)
-n_obs <- 1000
+n_obs <- 500
 X <- rnorm(n_obs, sd=1.5)
 X <- seq(-4,4,length.out = n_obs)
 X <- X[order(X)]
@@ -47,12 +47,12 @@ covmat2 <- mc_normpoly_common(as.matrix(X),
                              c(3,3,3), power = 1)
 covmat <- covmat1 + covmat2
 
-outro <- gp_mcla(covmat, make_binary(class_label), 3, max_iters = 50)
-
+system.time(outro <- gp_mcla(covmat, make_binary(class_label), 3, max_iters = 50, verbose=T))
+outro
 
 plot(X, p1, ylim=c(0,1), type='l', col='red')
 lines(X, p2, ylim=c(0,1), col='blue')
 lines(X, p3, ylim=c(0,1), col='green')
-points(X, outro[,1], pch=4, col='red')
-points(X, outro[,2], pch=4, col='blue')
-points(X, outro[,3], pch=4, col='green')
+points(X, outro$ps[,1], pch=4, col='red')
+points(X, outro$ps[,2], pch=4, col='blue')
+points(X, outro$ps[,3], pch=4, col='green')
