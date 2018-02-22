@@ -18,32 +18,32 @@ mcla_optimize <- function(X,
                           verbose = F){
 
     objective_function <- function(theta){
-        cov_matrix <- cov_function(as.matrix(X), theta)
-        ps_res <- gp_mcla(cov_matrix, y, verbose = F, tol = 1e-2)
-        ps_est <- pnorm(ps_res$PosteriorMean)
-
-        if(tolower(wts_vers) =='ate'){
-            ps_wts <- ifelse(y==1, 1/ps_est, 1/(1-ps_est))
-        } else if(tolower(wts_vers) == 'att') {
-            ps_wts <- ifelse(y==1, 1, ps_est/(1-ps_est))
-        } else {
-            message('invalid weighting scheme')
-            return(NULL)
-        }
-
-        if(balance_metric == 'mom_sq'){
-            cb_bal <- .mom_sq_bal(data.frame(X), 1:ncol(X), y==1, ps_wts)
-        } else if(balance_metric == 'mom'){
-            cb_bal <- .mom_bal(data.frame(X), 1:ncol(X), y==1, ps_wts)
-        } else if(balance_metric == 'ks'){
-            cb_bal <- 0
-            for(i in 1:ncol(X)){
-                cb_bal <- cb_bal + .ks_avg_test(X[,i], y, ps_est, 500)
-            }
-        } else(
-            return(NULL)
-        )
-        return(cb_bal)
+        cov_matrix <- cov_function(as.matrix(X), rep(theta, n_classes))
+        ps_res <- gp_mcla(cov_matrix, y, n_classes, verbose = F, tol = 1e-6)
+        return(-ps_res$logmarglik)
     }
+
+    start_time <- Sys.time()
+    if(verbose){
+        message(paste('Starting Optimization  @  ', start_time))
+    }
+    opt_theta <- minqa::bobyqa(par = init_theta,
+                               fn = objective_function,
+                               lower = rep(0, length(init_theta)),
+                               control=list('maxfun'=200))
+    print(opt_theta)
+    end_time <- Sys.time()
+    if(verbose){
+        message(paste('Finished Optimization  @  ', end_time))
+        message(paste('Time Difference          :', round(difftime(end_time, start_time, units='secs'), 4)))
+        message(paste('Optimal Covariate Balance:', opt_theta$fval))
+    }
+
+    opt_matrix <- cov_function(as.matrix(X), rep(opt_theta$par, n_classes))
+    opt_ps <- gp_mcla(opt_matrix, y, n_classes, verbose = F, tol = 1e-6)
+    opt_ps$ComputationTime <- difftime(end_time, start_time, units='secs')
+    opt_ps$thetas <- opt_theta$par
+
+    return(opt_ps)
 
 }
