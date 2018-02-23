@@ -1,13 +1,13 @@
 source('~/git/causalTools/causalTools.R')
 
 # set.seed(1162018)
-n_obs <- 2500
+n_obs <- 1000
 X <- rnorm(n_obs, sd=1.5)
 X <- seq(-4,4,length.out = n_obs)
 X <- X[order(X)]
-f1 <- 1.75 * X + 1
+f1 <- 0.75 * X + 1
 # f1 <- 3.75 * X + 1
-f2 <- 0.1 * X^4  + 0.25*X^2 - 1
+f2 <- 0.1 * X  + 0.25*X^2
 p1 <- exp(f1) / (1 + exp(f1) + exp(f2))
 p2 <- exp(f2) / (1 + exp(f1) + exp(f2))
 p3 <- 1 / (1 + exp(f1) + exp(f2))
@@ -68,4 +68,14 @@ lines(X, p3, ylim=c(0,1), col='green')
 points(X, testing$ps[,1], pch=4, col='red')
 points(X, testing$ps[,2], pch=4, col='blue')
 points(X, testing$ps[,3], pch=4, col='green')
+
+
+wts_mat <- matrix(NA, nrow=n_obs, ncol=1)
+wts_mat[class_label==1,] <- 1 / testing$ps[class_label==1,1]
+wts_mat[class_label==2,] <- 1 / testing$ps[class_label==2,2]
+wts_mat[class_label==3,] <- 1 / testing$ps[class_label==3,3]
+wts_mat <- as.vector(wts_mat)
+
+multicovbal(X, class_label, wts_mat)
+
 

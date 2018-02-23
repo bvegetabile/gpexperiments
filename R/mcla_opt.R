@@ -47,3 +47,54 @@ mcla_optimize <- function(X,
     return(opt_ps)
 
 }
+
+
+multicovbal <- function(X, TA, wts=NULL, plot=T){
+    X <- as.matrix(X)
+    lvls <- unique(TA)
+    n_lvls <- length(lvls)
+
+    n_covs <- ncol(X)
+    barx_cov <- apply(X, 2, mean)
+    varx_cov <- apply(X, 2, var)
+
+    before_table <- matrix(nrow = n_covs, ncol = 2*n_lvls + 1)
+    colnames(before_table)[1:(2*n_lvls + 1)] <- c('Overall Mean')
+    colnames(before_table)[seq(2, 2*n_lvls, 2)] <- paste("TA=", lvls, ":Mean", sep = '')
+    colnames(before_table)[seq(3, 2*n_lvls+1, 2)] <- paste("TA=", lvls, ":Delta", sep = '')
+    for(i in 1:n_covs){
+        before_table[i, 1] <- barx_cov[i]
+        for(j in 1:n_lvls){
+            barx_cov_lvl <- mean(X[TA==lvls[j], i])
+            varx_cov_lvl <- var(X[TA==lvls[j], i])
+            before_table[i, 2*j] <- barx_cov_lvl
+            before_table[i, 2*j + 1] <- (barx_cov[i] - barx_cov_lvl) / sqrt((varx_cov[i] + varx_cov_lvl)/2)
+        }
+    }
+
+    if(is.null(wts)){
+        return(before_table)
+    } else {
+        after_table <- matrix(nrow = n_covs, ncol = 2*n_lvls + 1)
+        colnames(after_table)[1:(2*n_lvls + 1)] <- c('Overall Mean')
+        colnames(after_table)[seq(2, 2*n_lvls, 2)] <- paste("TA=", lvls, ":Mean", sep = '')
+        colnames(after_table)[seq(3, 2*n_lvls+1, 2)] <- paste("TA=", lvls, ":Delta", sep = '')
+        for(i in 1:n_covs){
+            after_table[i, 1] <- barx_cov[i]
+            for(j in 1:n_lvls){
+                barx_cov_lvl <- sum(X[TA==lvls[j] ,i] * wts[TA==lvls[j]]) / sum(wts[TA==lvls[j]])
+                varx_cov_lvl <- sum((X[TA==lvls[j] ,i] - barx_cov_lvl)^2 * wts[TA==lvls[j]]) / sum(wts[TA==lvls[j]])
+                after_table[i, 2*j] <- barx_cov_lvl
+                after_table[i, 2*j + 1] <- (barx_cov[i] - barx_cov_lvl) / sqrt((varx_cov[i] + varx_cov_lvl)/2)
+            }
+        }
+        return(list('before_balance' = round(before_table,3),
+                    'after_balance' = round(after_table,3)))
+    }
+}
+
+
+
+mcgpbal <- function(){
+
+}
