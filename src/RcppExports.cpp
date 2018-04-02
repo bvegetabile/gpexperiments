@@ -111,15 +111,34 @@ BEGIN_RCPP
 END_RCPP
 }
 // gp_mcla
-arma::mat gp_mcla(arma::mat covmat, arma::vec targets, int n_classes);
-RcppExport SEXP _gpexperiments_gp_mcla(SEXP covmatSEXP, SEXP targetsSEXP, SEXP n_classesSEXP) {
+List gp_mcla(arma::mat covmat, arma::vec targets, int n_classes, double tol, int max_iters, bool verbose);
+RcppExport SEXP _gpexperiments_gp_mcla(SEXP covmatSEXP, SEXP targetsSEXP, SEXP n_classesSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type covmat(covmatSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type targets(targetsSEXP);
     Rcpp::traits::input_parameter< int >::type n_classes(n_classesSEXP);
-    rcpp_result_gen = Rcpp::wrap(gp_mcla(covmat, targets, n_classes));
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iters(max_itersSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(gp_mcla(covmat, targets, n_classes, tol, max_iters, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gp_mcla_fast
+List gp_mcla_fast(arma::mat covmat, arma::vec targets, int n_classes, double tol, int max_iters, bool verbose);
+RcppExport SEXP _gpexperiments_gp_mcla_fast(SEXP covmatSEXP, SEXP targetsSEXP, SEXP n_classesSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type covmat(covmatSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type targets(targetsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_classes(n_classesSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iters(max_itersSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(gp_mcla_fast(covmat, targets, n_classes, tol, max_iters, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -149,6 +168,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
     Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
     rcpp_result_gen = Rcpp::wrap(mc_sqexp_common(X, inv_ls_vec, scale, noise));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mc_normpoly_common
+arma::mat mc_normpoly_common(arma::mat X, arma::vec sig_shift, arma::vec sig_scale, int power, double noise);
+RcppExport SEXP _gpexperiments_mc_normpoly_common(SEXP XSEXP, SEXP sig_shiftSEXP, SEXP sig_scaleSEXP, SEXP powerSEXP, SEXP noiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig_shift(sig_shiftSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig_scale(sig_scaleSEXP);
+    Rcpp::traits::input_parameter< int >::type power(powerSEXP);
+    Rcpp::traits::input_parameter< double >::type noise(noiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(mc_normpoly_common(X, sig_shift, sig_scale, power, noise));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -253,9 +287,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_par_ep", (DL_FUNC) &_gpexperiments_par_ep, 5},
     {"_gpexperiments_seq_ep", (DL_FUNC) &_gpexperiments_seq_ep, 5},
     {"_gpexperiments_par_ep_predict", (DL_FUNC) &_gpexperiments_par_ep_predict, 7},
-    {"_gpexperiments_gp_mcla", (DL_FUNC) &_gpexperiments_gp_mcla, 3},
+    {"_gpexperiments_gp_mcla", (DL_FUNC) &_gpexperiments_gp_mcla, 6},
+    {"_gpexperiments_gp_mcla_fast", (DL_FUNC) &_gpexperiments_gp_mcla_fast, 6},
     {"_gpexperiments_c_gpr", (DL_FUNC) &_gpexperiments_c_gpr, 5},
     {"_gpexperiments_mc_sqexp_common", (DL_FUNC) &_gpexperiments_mc_sqexp_common, 4},
+    {"_gpexperiments_mc_normpoly_common", (DL_FUNC) &_gpexperiments_mc_normpoly_common, 5},
     {"_gpexperiments_nystrom", (DL_FUNC) &_gpexperiments_nystrom, 2},
     {"_gpexperiments_nystrom_inv", (DL_FUNC) &_gpexperiments_nystrom_inv, 3},
     {"_gpexperiments_nystrom_inv2", (DL_FUNC) &_gpexperiments_nystrom_inv2, 3},
