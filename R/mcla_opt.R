@@ -49,6 +49,59 @@ mcla_optimize <- function(X,
 }
 
 
+
+mcla_optbal <- function(X,
+                        y,
+                        cov_function,
+                        init_theta,
+                        return_theta = F,
+                        verbose = F){
+
+    n_obs <- length(y)
+    found_classes <- as.vector(unique(y))
+    found_classes <- found_classes[order(found_classes)]
+    n_classes <- length(found_classes)
+    targets <- matrix(NA, nrow=n_obs, ncol=n_classes)
+
+    for(c in 1:n_classes){
+        targets[,c] <- ifelse(y == found_classes[c], 1, 0)
+    }
+
+    objective_function <- function(theta){
+        cov_matrix <- cov_function(as.matrix(X), rep(theta, n_classes))
+        ps_res <- mcla_fixed(y, cov_matrix, verbose = F, tol = 1e-3)
+        wts_mat <- ifelse(targets, 1/ps_res$ps, 0)
+        wts <- apply(wts_mat, 1, sum)
+        ifelse
+        return(mtbal(X = X, TA = y, wts=wts))
+    }
+
+    start_time <- Sys.time()
+    if(verbose){
+        message(paste('Starting Optimization  @  ', start_time))
+    }
+    opt_theta <- minqa::bobyqa(par = init_theta,
+                               fn = objective_function,
+                               lower = rep(0, length(init_theta)),
+                               control=list('maxfun'=200))
+    print(opt_theta)
+    end_time <- Sys.time()
+    if(verbose){
+        message(paste('Finished Optimization  @  ', end_time))
+        message(paste('Time Difference          :', round(difftime(end_time, start_time, units='secs'), 4)))
+        message(paste('Optimal Covariate Balance:', opt_theta$fval))
+    }
+
+    opt_matrix <- cov_function(as.matrix(X), rep(opt_theta$par, n_classes))
+    opt_ps <- mcla_fixed(y, opt_matrix, verbose = F, tol = 1e-6)
+    opt_ps$ComputationTime <- difftime(end_time, start_time, units='secs')
+    opt_ps$thetas <- opt_theta$par
+
+    return(opt_ps)
+
+}
+
+
 multicovbal <- function(X, TA, wts=NULL, plot=T){
     X <- as.matrix(X)
     lvls <- unique(TA)
@@ -95,6 +148,74 @@ multicovbal <- function(X, TA, wts=NULL, plot=T){
 
 
 
-mcgpbal <- function(){
+mtbal <- function(X, TA, wts = NULL){
+    X <- scale(X)
+    n_cov <- ncol(X)
+    obs_t <- unique(TA)
+    n_cat <- length(obs_t)
+    bal_vec <- c()
+    for(c in 1:n_cov){
+        X_i <- X[,c]
+        X_type <- ifelse(length(unique(X_i)) > 2, 'continuous', 'binary')
+        # print(X_type)
+        if(is.null(wts)){
+            for(i in 1:n_cat){
+                bar_x <- mean(X_i[TA == obs_t[i]])
+                sd2_x <- var(X_i[TA == obs_t[i]])
+                if(X_type == 'continuous'){
+                    bal_vec <- c(bal_vec, bar_x)
+                } else {
+                    bal_vec <- c(bal_vec, bar_x)
+                }
+            }
+        } else {
+            for(i in 1:n_cat){
+                wts_c <- wts[TA == obs_t[i]]
+                bar_x <- sum(wts_c * X_i[TA == obs_t[i]]) / sum(wts_c)
+                sd2_x <- sum(wts_c * (X_i[TA == obs_t[i]] - bar_x)^2) / sum(wts_c)
+                if(X_type == 'continuous'){
+                    bal_vec <- c(bal_vec, bar_x)
+                } else {
+                    bal_vec <- c(bal_vec, bar_x)
+                }
+            }
+        }
+    }
+    sqrt(sum(bal_vec^2))
+}
 
+mtbal2 <- function(X, TA, wts = NULL){
+    X <- scale(X)
+    n_cov <- ncol(X)
+    obs_t <- unique(TA)
+    n_cat <- length(obs_t)
+    bal_vec <- c()
+    for(c in 1:n_cov){
+        X_i <- X[,c]
+        X_type <- ifelse(length(unique(X_i)) > 2, 'continuous', 'binary')
+        # print(X_type)
+        if(is.null(wts)){
+            for(i in 1:n_cat){
+                bar_x <- mean(X_i[TA == obs_t[i]])
+                sd2_x <- var(X_i[TA == obs_t[i]])
+                if(X_type == 'continuous'){
+                    bal_vec <- c(bal_vec, bar_x, log(sd2_x))
+                } else {
+                    bal_vec <- c(bal_vec, bar_x)
+                }
+            }
+        } else {
+            for(i in 1:n_cat){
+                wts_c <- wts[TA == obs_t[i]]
+                bar_x <- sum(wts_c * X_i[TA == obs_t[i]]) / sum(wts_c)
+                sd2_x <- sum(wts_c * (X_i[TA == obs_t[i]] - bar_x)^2) / sum(wts_c)
+                if(X_type == 'continuous'){
+                    bal_vec <- c(bal_vec, bar_x, log(sd2_x))
+                } else {
+                    bal_vec <- c(bal_vec, bar_x)
+                }
+            }
+        }
+    }
+    sqrt(sum(bal_vec^2))
 }
