@@ -33,10 +33,6 @@ gp_mcla <- function(covmat, targets, n_classes, tol = 1e-10, max_iters = 20L, ve
     .Call(`_gpexperiments_gp_mcla`, covmat, targets, n_classes, tol, max_iters, verbose)
 }
 
-gp_mcla_fast <- function(covmat, targets, n_classes, tol = 1e-10, max_iters = 20L, verbose = FALSE) {
-    .Call(`_gpexperiments_gp_mcla_fast`, covmat, targets, n_classes, tol, max_iters, verbose)
-}
-
 c_gpr <- function(K_UL, y, K_UR, K_LR, noise) {
     .Call(`_gpexperiments_c_gpr`, K_UL, y, K_UR, K_LR, noise)
 }

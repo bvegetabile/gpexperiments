@@ -73,7 +73,7 @@ mcla_optbal <- function(X,
         wts_mat <- ifelse(targets, 1/ps_res$ps, 0)
         wts <- apply(wts_mat, 1, sum)
         ifelse
-        return(mtbal(X = X, TA = y, wts=wts))
+        return(mtbal2(X = X, TA = y, wts=wts))
     }
 
     start_time <- Sys.time()

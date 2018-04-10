@@ -6,11 +6,11 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 List gp_mcla(arma::mat covmat,
-                  arma::vec targets,
-                  int n_classes,
-                  double tol = 1e-10,
-                  int max_iters = 20,
-                  bool verbose = false){
+             arma::vec targets,
+             int n_classes,
+             double tol = 1e-10,
+             int max_iters = 20,
+             bool verbose = false){
     int N = targets.n_elem;
     int obs_per_class = N / n_classes;
     // Initializing latent scores

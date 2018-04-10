@@ -126,22 +126,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// gp_mcla_fast
-List gp_mcla_fast(arma::mat covmat, arma::vec targets, int n_classes, double tol, int max_iters, bool verbose);
-RcppExport SEXP _gpexperiments_gp_mcla_fast(SEXP covmatSEXP, SEXP targetsSEXP, SEXP n_classesSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type covmat(covmatSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type targets(targetsSEXP);
-    Rcpp::traits::input_parameter< int >::type n_classes(n_classesSEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    Rcpp::traits::input_parameter< int >::type max_iters(max_itersSEXP);
-    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(gp_mcla_fast(covmat, targets, n_classes, tol, max_iters, verbose));
-    return rcpp_result_gen;
-END_RCPP
-}
 // c_gpr
 List c_gpr(arma::mat K_UL, arma::vec y, arma::mat K_UR, arma::mat K_LR, double noise);
 RcppExport SEXP _gpexperiments_c_gpr(SEXP K_ULSEXP, SEXP ySEXP, SEXP K_URSEXP, SEXP K_LRSEXP, SEXP noiseSEXP) {
@@ -288,7 +272,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_seq_ep", (DL_FUNC) &_gpexperiments_seq_ep, 5},
     {"_gpexperiments_par_ep_predict", (DL_FUNC) &_gpexperiments_par_ep_predict, 7},
     {"_gpexperiments_gp_mcla", (DL_FUNC) &_gpexperiments_gp_mcla, 6},
-    {"_gpexperiments_gp_mcla_fast", (DL_FUNC) &_gpexperiments_gp_mcla_fast, 6},
     {"_gpexperiments_c_gpr", (DL_FUNC) &_gpexperiments_c_gpr, 5},
     {"_gpexperiments_mc_sqexp_common", (DL_FUNC) &_gpexperiments_mc_sqexp_common, 4},
     {"_gpexperiments_mc_normpoly_common", (DL_FUNC) &_gpexperiments_mc_normpoly_common, 5},
