@@ -74,6 +74,83 @@ gpbal_fixed <- function(y, cov_matrix,
   return(results)
 }
 
+gpbal_damping <- function(y, cov_matrix,
+                        tol=1e-2,
+                        max_iters=20,
+                        verbose = T,
+                        ep_vers = 'parallel',
+                        damping = 0.75){
+    ##############################################################################
+    # Expectation Propagation Algorithm from Rasmussen & Williams
+    # - Algorithms: 3.5, 3.6
+    ##############################################################################
+    start_time <- Sys.time()
+    if(verbose){
+        message('Starting: Expectation Propagation for Gaussian Process Classification')
+        message('Start Time: ', start_time)
+    }
+
+    # Data checking.  Finding the classes and the number of observations
+    classes = sort(unique(y))
+    n_obs = length(y)
+
+    # Data checking to ensure correct dimensions
+    if(n_obs != nrow(cov_matrix)){
+        message(paste('Error: Vec y of length:', n_obs,
+                      'not equal to CovMat dimension:', nrow(cov_matrix), ncol(cov_matrix)))
+    }
+
+    if(length(classes) != 2){
+        message("Error: Algorithm requires two classes exactly")
+        return()
+    }
+
+    if(classes[1] == 0 && classes[2] == 1){
+        y[y==0] = -1
+        classes = sort(unique(y))
+    } else if (classes[1] != -1 || classes[2] != 1){
+        message("Error: Requires class labels -1 and 1 for Expectation Propagation")
+        message(paste('Classes found: ', toString(classes)))
+        return()
+    }
+
+    # Converting target inputs to a column vector
+    y = matrix(y, nrow=n_obs, ncol=1)
+
+    #-----------------------------------------------------------------------------
+    # Running the Expectation Propagation Algorthim using C++ vvvvvvvvvvvvvvvvvvvv
+    #-----------------------------------------------------------------------------
+    if(length(grep(ep_vers, 'parallel'))){
+        results <- par_ep_damping(y, cov_matrix, tol, max_iters, verbose, damping)
+    } else if(length(grep(ep_vers, 'sequential'))) {
+        results <- seq_ep(y, cov_matrix, tol, max_iters, verbose)
+    } else {
+        message("Error: ep_vers not compatible")
+    }
+    #-----------------------------------------------------------------------------
+    # Optimized C++ Code ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    #-----------------------------------------------------------------------------
+
+    end_time <- Sys.time()
+    dur_type <- 'mins'
+    dur = difftime(end_time, start_time, units=dur_type)
+    if(dur < 1){
+        dur_type <- 'secs'
+        dur = difftime(end_time, start_time, units=dur_type)
+    }
+    if(verbose){
+        message('\nEnd Time: ', end_time)
+        message('Duration: ', round(dur,3), paste(' ', dur_type, sep = ''))
+        message('Approximate log Marginal Likelihood: ', round(results[['log_Z_ep']],3))
+        message(paste('Number of Iterations:',results[['Number_Iters']]))
+    }
+
+    results[['ComputationTime']] = dur
+    results[['ps']] <- pnorm(results$PosteriorMean)
+
+    return(results)
+}
+
 
 gpbal <- function(X, y,
                   cov_function,

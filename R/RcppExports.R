@@ -29,6 +29,10 @@ par_ep_predict <- function(y, cov_matrix, cov_lower, cov_between, tol, max_iters
     .Call(`_gpexperiments_par_ep_predict`, y, cov_matrix, cov_lower, cov_between, tol, max_iters, verbose)
 }
 
+par_ep_damping <- function(y, cov_matrix, tol, max_iters, verbose, damping) {
+    .Call(`_gpexperiments_par_ep_damping`, y, cov_matrix, tol, max_iters, verbose, damping)
+}
+
 gp_mcla <- function(covmat, targets, n_classes, tol = 1e-10, max_iters = 20L, verbose = FALSE) {
     .Call(`_gpexperiments_gp_mcla`, covmat, targets, n_classes, tol, max_iters, verbose)
 }

@@ -110,6 +110,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// par_ep_damping
+List par_ep_damping(arma::vec y, arma::mat cov_matrix, double tol, int max_iters, bool verbose, double damping);
+RcppExport SEXP _gpexperiments_par_ep_damping(SEXP ySEXP, SEXP cov_matrixSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP, SEXP dampingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cov_matrix(cov_matrixSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iters(max_itersSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< double >::type damping(dampingSEXP);
+    rcpp_result_gen = Rcpp::wrap(par_ep_damping(y, cov_matrix, tol, max_iters, verbose, damping));
+    return rcpp_result_gen;
+END_RCPP
+}
 // gp_mcla
 List gp_mcla(arma::mat covmat, arma::vec targets, int n_classes, double tol, int max_iters, bool verbose);
 RcppExport SEXP _gpexperiments_gp_mcla(SEXP covmatSEXP, SEXP targetsSEXP, SEXP n_classesSEXP, SEXP tolSEXP, SEXP max_itersSEXP, SEXP verboseSEXP) {
@@ -271,6 +287,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gpexperiments_par_ep", (DL_FUNC) &_gpexperiments_par_ep, 5},
     {"_gpexperiments_seq_ep", (DL_FUNC) &_gpexperiments_seq_ep, 5},
     {"_gpexperiments_par_ep_predict", (DL_FUNC) &_gpexperiments_par_ep_predict, 7},
+    {"_gpexperiments_par_ep_damping", (DL_FUNC) &_gpexperiments_par_ep_damping, 6},
     {"_gpexperiments_gp_mcla", (DL_FUNC) &_gpexperiments_gp_mcla, 6},
     {"_gpexperiments_c_gpr", (DL_FUNC) &_gpexperiments_c_gpr, 5},
     {"_gpexperiments_mc_sqexp_common", (DL_FUNC) &_gpexperiments_mc_sqexp_common, 4},

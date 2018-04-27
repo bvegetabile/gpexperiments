@@ -247,9 +247,9 @@ List par_ep(arma::vec y,
   return(List::create(
     _["Number_Iters"] = iters,
     _["PosteriorMean"] = mu,
-    _["PosteriorVar"] = sigma_mat,
-    _["tilde_nu"] = tilde_nu,
-    _["tilde_tau"] = tilde_tau,
+    // _["PosteriorVar"] = sigma_mat,
+    // _["tilde_nu"] = tilde_nu,
+    // _["tilde_tau"] = tilde_tau,
     _["log_Z_ep"] = log_Z_ep));
 };
 
@@ -550,3 +550,131 @@ List par_ep_predict(arma::vec y,
             _["test_predictions"] = predictions));
 };
 
+
+
+// [[Rcpp::export]]
+List par_ep_damping(arma::vec y,
+                    arma::mat cov_matrix,
+                    double tol,
+                    int max_iters,
+                    bool verbose,
+                    double damping) {
+
+    /* allocate things...
+    *
+    */
+    RNGScope rngScope;
+
+    // Finding the total number of observations to initialize all vectors
+    int n_obs = y.size();
+    const arma::mat big_eye = arma::eye(n_obs, n_obs);
+
+    //Initialization of natural site parameters
+    arma::vec tilde_nu(n_obs, arma::fill::zeros);
+    arma::vec tilde_tau(n_obs, arma::fill::zeros);
+
+    // Initialization of Posterior Values
+    arma::vec mu(n_obs, arma::fill::zeros);
+    arma::mat sigma_mat = cov_matrix;
+
+    // Initialization of hat parameters
+    arma::vec small_z(n_obs, arma::fill::zeros);
+    arma::vec big_z = std_norm_cdf(small_z);
+    arma::vec hat_mu(n_obs, arma::fill::zeros);
+    arma::vec hat_sig(n_obs, arma::fill::zeros);
+
+    // Initializatio of cavity parameters
+    arma::vec cavity_tau(n_obs, arma::fill::zeros);
+    arma::vec cavity_nu(n_obs, arma::fill::zeros);
+
+    // Setting Initial Values for convergence criteria
+    double max_change_tau = 100;
+    double max_change_nu = 100;
+
+    // double percent_change_tau = 1;
+    // double percent_change_nu = 1;
+
+
+
+    // Initializing count for iterations
+    int iters = 0;
+
+    if(verbose){
+        REprintf(".");
+    }
+
+    /*
+    * Initialization outside of loop for efficiency;
+    */
+
+    arma::mat S_tilde_onehalf;
+    arma::mat L;
+    arma::mat V;
+    arma::vec old_tau;
+    arma::vec old_nu;
+
+
+    while((max_change_nu > tol or max_change_tau > tol) and iters < max_iters){
+        //# while(iters < max_iters){
+        // Creating a Random Order to Calculate Approximations
+        arma::ivec random_order(n_obs);
+        std::iota(random_order.begin(), random_order.end(), 0);
+        std::random_shuffle(random_order.begin(), random_order.end());
+
+        old_tau = tilde_tau;
+        old_nu = tilde_nu;
+
+        UpdateSiteParameters updateSiteParameters(random_order,
+                                                  y,
+                                                  old_nu,
+                                                  old_tau,
+                                                  mu,
+                                                  sigma_mat,
+                                                  cavity_tau,
+                                                  cavity_nu,
+                                                  hat_mu,
+                                                  hat_sig,
+                                                  small_z,
+                                                  big_z,
+                                                  tilde_nu,
+                                                  tilde_tau);
+
+        parallelFor(0, n_obs, updateSiteParameters);
+
+
+        tilde_nu = damping * tilde_nu + (1 - damping) * old_nu;
+        tilde_tau = damping * tilde_tau + (1 - damping) * old_tau;
+
+        S_tilde_onehalf = diagmat(arma::sqrt(tilde_tau));
+        L = arma::chol(big_eye + S_tilde_onehalf * cov_matrix * S_tilde_onehalf, "lower");
+        V = arma::solve(trimatl(L), S_tilde_onehalf*cov_matrix);
+
+        sigma_mat = cov_matrix - V.t() * V;
+        mu = sigma_mat * tilde_nu;
+
+        max_change_nu = max(abs(old_nu - tilde_nu));
+        max_change_tau = max(abs(old_tau - tilde_tau));
+        iters += 1;
+        if(verbose){
+            REprintf(".");
+        }
+    }
+
+    arma::vec cavity_mu = cavity_nu / cavity_tau;
+    arma::mat T_mat = diagmat(cavity_tau);
+    arma::mat S_tilde = diagmat(tilde_tau);
+
+    double terms_4_1 = 0.5*sum(log(1.0 + tilde_tau/cavity_tau)) - trace(log(L));
+    double terms_2_5quad = 0.5 * dot(tilde_nu, (sigma_mat - inv_sympd(T_mat + S_tilde))*tilde_nu);
+    double terms_5remain = 0.5 * dot(cavity_mu, T_mat * inv_sympd(S_tilde + T_mat) * (S_tilde*cavity_mu + 2.0*tilde_nu));
+    double terms_3 = sum(log(big_z));
+    //
+    double log_Z_ep = terms_4_1 + terms_2_5quad + terms_5remain + terms_3;
+    return(List::create(
+            _["Number_Iters"] = iters,
+            _["PosteriorMean"] = mu,
+            // _["PosteriorVar"] = sigma_mat,
+            // _["tilde_nu"] = tilde_nu,
+            // _["tilde_tau"] = tilde_tau,
+            _["log_Z_ep"] = log_Z_ep));
+};
